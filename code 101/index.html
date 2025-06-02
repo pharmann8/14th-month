@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queen of Hearts - Venetian Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Crimson+Text:wght@400;600&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8941F;
+            --red: #DC143C;
+            --dark-red: #8B0000;
+            --black: #2F2F2F;
+            --cream: #F4E4BC;
+            --light-cream: #E8D5A3;
+            --green: #228B22;
+            --diamond: #FF6347;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            --transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Crimson Text', serif;
+            background: 
+                linear-gradient(135deg, #0a0505 0%, #1a0505 20%, var(--dark-red) 40%, #2F0A0A 60%, #0a0505 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="damask" patternUnits="userSpaceOnUse" width="50" height="50"><path d="M25 10 Q35 0 25 20 Q15 0 25 10 Z" fill="rgba(139,0,0,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23damask)"/></svg>');
+            color: var(--cream);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            touch-action: manipulation;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(255, 69, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(139, 0, 0, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: ambientGlow 8s ease-in-out infinite alternate;
+            will-change: opacity;
+        }
+        
+        @keyframes ambientGlow {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        
+        .decorative-element {
+            position: fixed;
+            font-size: 2.5rem;
+            opacity: 0.3;
+            z-index: 10;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .decorative-element:hover {
+            opacity: 0.8;
+            transform: scale(1.2);
+        }
+        
+        .venetian-mask {
+            top: 20px;
+            left: 20px;
+            animation: maskFloat 6s ease-in-out infinite alternate;
+        }
+        
+        @keyframes maskFloat {
+            0% { transform: rotate(-5deg) translateY(0px); }
+            100% { transform: rotate(5deg) translateY(-10px); }
+        }
+        
+        .wine-glass {
+            bottom: 30px;
+            right: 30px;
+            font-size: 3rem;
+            animation: wineSwirl 4s ease-in-out infinite;
+        }
+        
+        @keyframes wineSwirl {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .heart {
+            position: absolute;
+            color: rgba(220, 20, 60, 0.3);
+            font-size: 1.5rem;
+            will-change: transform, opacity;
+        }
+        
+        .scene {
+            display: none;
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 25px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            padding: 3rem;
+            box-shadow: var(--shadow),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            will-change: transform, opacity;
+        }
+        
+        .scene.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            text-shadow: 
+                3px 3px 12px rgba(0, 0, 0, 0.8),
+                0 0 30px rgba(255, 215, 0, 0.3);
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700, #FF6347);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .italian-subtitle {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--gold);
+            font-style: italic;
+            opacity: 0.9;
+            animation: subtitleGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes subtitleGlow {
+            0% { text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+            100% { text-shadow: 0 0 30px rgba(212, 175, 55, 0.8); }
+        }
+        
+        .card-table {
+            background: radial-gradient(ellipse at center, #0F4A0F 0%, #0D2818 100%);
+            border-radius: 50px;
+            padding: 3rem;
+            margin: 2rem auto;
+            border: 5px solid var(--gold);
+            box-shadow: 
+                0 0 50px rgba(212, 175, 55, 0.3),
+                inset 0 0 100px rgba(0, 0, 0, 0.5);
+            position: relative;
+            max-width: 900px;
+        }
+        
+        .card-table::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700);
+            border-radius: 50px;
+            z-index: -1;
+            animation: tableGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes tableGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 0.8; }
+        }
+        
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            perspective: 1000px;
+        }
+        
+        .card {
+            width: 200px;
+            height: 300px;
+            background: 
+                linear-gradient(145deg, var(--cream), var(--light-cream)),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/><path d="M0 0 L100 100 M100 0 L0 100" stroke="rgba(212,175,55,0.1)" stroke-width="0.5"/></svg>');
+            border: 4px solid var(--gold);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 215, 0, 0.2) 50%, transparent 70%);
+            transform: rotate(45deg) translateX(-100%);
+            transition: transform 0.8s ease;
+        }
+        
+        .card:hover::before {
+            transform: rotate(45deg) translateX(100%);
+        }
+        
+        .card:hover {
+            transform: translateY(-20px) rotateY(10deg) scale(1.08);
+            box-shadow: 
+                0 25px 50px rgba(212, 175, 55, 0.4),
+                0 0 30px rgba(255, 215, 0, 0.3);
+        }
+        
+        .card:active {
+            transform: translateY(-15px) rotateY(5deg) scale(1.05);
+        }
+        
+        .card-suit {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.4));
+            animation: suitPulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes suitPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+        
+        .hearts { 
+            color: var(--red); 
+            text-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+        }
+        .spades { 
+            color: var(--black); 
+            text-shadow: 0 0 20px rgba(47, 47, 47, 0.8);
+        }
+        .diamonds { 
+            color: var(--diamond); 
+            text-shadow: 0 0 20px rgba(255, 99, 71, 0.5);
+        }
+        .clubs { 
+            color: var(--green); 
+            text-shadow: 0 0 20px rgba(34, 139, 34, 0.5);
+        }
+        
+        .card-text {
+            color: var(--dark-red);
+            font-weight: 600;
+            text-align: center;
+            padding: 0 20px;
+            line-height: 1.5;
+            font-size: 1.1rem;
+        }
+        
+        .story-text {
+            font-size: 1.4rem;
+            line-height: 2;
+            margin: 2.5rem auto;
+            text-align: center;
+            max-width: 700px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .roulette-wheel {
+            width: 300px;
+            height: 300px;
+            border: 8px solid var(--gold);
+            border-radius: 50%;
+            background: 
+                conic-gradient(
+                    var(--red) 0deg, var(--black) 18deg,
+                    var(--red) 36deg, var(--black) 54deg,
+                    var(--red) 72deg, var(--black) 90deg,
+                    var(--red) 108deg, var(--black) 126deg,
+                    var(--red) 144deg, var(--black) 162deg,
+                    var(--red) 180deg, var(--black) 198deg,
+                    var(--red) 216deg, var(--black) 234deg,
+                    var(--red) 252deg, var(--black) 270deg,
+                    var(--red) 288deg, var(--black) 306deg,
+                    var(--red) 324deg, var(--black) 342deg,
+                    var(--red) 360deg
+                );
+            margin: 2rem auto;
+            position: relative;
+            cursor: pointer;
+            transition: transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 
+                0 0 50px rgba(212, 175, 55, 0.5),
+                inset 0 0 50px rgba(0, 0, 0, 0.3);
+            will-change: transform;
+        }
+        
+        .roulette-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #FFD700, var(--gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--dark-red);
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+        
+        .poker-chips {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+        
+        .chip {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 6px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            will-change: transform;
+        }
+        
+        .chip::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            top: 10px;
+            left: 10px;
+        }
+        
+        .chip:hover {
+            transform: translateY(-10px) scale(1.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .chip-red {
+            background: radial-gradient(circle, var(--red), var(--dark-red));
+            border-color: #FFD700;
+            color: white;
+        }
+        
+        .chip-black {
+            background: radial-gradient(circle, var(--black), #000000);
+            border-color: var(--gold);
+            color: white;
+        }
+        
+        .chip-green {
+            background: radial-gradient(circle, var(--green), #006400);
+            border-color: #FFD700;
+            color: white;
+        }
+        
+        .venetian-scroll {
+            background: 
+                linear-gradient(145deg, var(--cream), var(--light-cream)),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10 Q50 30 90 10 Q50 70 10 90 Q50 70 90 90 Q50 30 10 10" fill="none" stroke="rgba(139,0,0,0.1)" stroke-width="2"/></svg>');
+            color: var(--dark-red);
+            padding: 3rem;
+            border-radius: 25px;
+            border: 4px solid var(--gold);
+            margin: 2rem auto;
+            font-size: 1.2rem;
+            line-height: 2;
+            text-align: center;
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.4),
+                inset 0 0 30px rgba(212, 175, 55, 0.1);
+            position: relative;
+            max-width: 800px;
+        }
+        
+        .venetian-scroll::before {
+            content: '🏛️';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 3rem;
+            background: linear-gradient(145deg, var(--gold), var(--dark-gold));
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 2rem auto;
+        }
+        
+        .dice {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, var(--cream), var(--light-cream));
+            border: 3px solid var(--gold);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--dark-red);
+            cursor: pointer;
+            transition: all 0.5s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            animation: diceFloat 3s ease-in-out infinite alternate;
+            will-change: transform;
+        }
+        
+        @keyframes diceFloat {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        .dice:hover {
+            transform: rotateX(360deg) scale(1.2);
+        }
+        
+        /* Slot Machine Styles */
+        .slot-machine {
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            background: linear-gradient(145deg, #2F0A0A, var(--dark-red));
+            border-radius: 20px;
+            border: 5px solid var(--gold);
+            padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .slot-reels {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 2rem 0;
+            perspective: 1000px;
+        }
+        
+        .slot-reel {
+            width: 100px;
+            height: 150px;
+            background: linear-gradient(145deg, var(--cream), var(--light-cream));
+            border-radius: 15px;
+            border: 4px solid var(--gold);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .slot-symbol {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: absolute;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+        
+        .slot-lever {
+            width: 60px;
+            height: 120px;
+            background: linear-gradient(to right, #8B0000, var(--dark-red), #8B0000);
+            border: 4px solid var(--gold);
+            border-radius: 10px;
+            margin: 0 auto;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .slot-lever::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            height: 20px;
+            background: rgba(212, 175, 55, 0.3);
+            border-radius: 5px;
+        }
+        
+        .slot-lever:hover {
+            transform: scale(1.05);
+        }
+        
+        .slot-lever:active {
+            transform: translateY(10px) scale(0.95);
+        }
+        
+        .slot-hearts {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .slot-heart {
+            font-size: 2rem;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+        
+        .slot-heart.active {
+            opacity: 1;
+            color: var(--red);
+            transform: scale(1.2);
+            text-shadow: 0 0 20px rgba(220, 20, 60, 0.8);
+        }
+        
+        .gondola {
+            position: fixed;
+            bottom: 0;
+            left: -200px;
+            font-size: 4rem;
+            z-index: 5;
+        }
+        
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            will-change: transform, opacity;
+        }
+        
+        .btn {
+            padding: 18px 45px;
+            font-size: 1.6rem;
+            background: linear-gradient(145deg, var(--gold), var(--dark-gold), #FFD700);
+            color: #2F0A0A;
+            border: 3px solid #FFD700;
+            border-radius: 35px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            transition: var(--transition);
+            box-shadow: 
+                0 12px 35px rgba(212, 175, 55, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            margin: 1rem;
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 
+                0 20px 50px rgba(212, 175, 55, 0.5),
+                0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            background: rgba(212, 175, 55, 0.3);
+            color: var(--cream);
+            border: 2px solid var(--gold);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Playfair Display', serif;
+            transition: var(--transition);
+            z-index: 10;
+            opacity: 0.7;
+            backdrop-filter: blur(5px);
+        }
+        
+        .back-btn:hover {
+            opacity: 1;
+            background: rgba(212, 175, 55, 0.5);
+            transform: translateY(-3px);
+        }
+        
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.3);
+            transition: var(--transition);
+        }
+        
+        .progress-dot.active {
+            background: var(--gold);
+            transform: scale(1.2);
+        }
+        
+        .italian-quote {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: #FFD700;
+            font-style: italic;
+            margin: 2rem auto;
+            opacity: 0.9;
+            max-width: 700px;
+            text-align: center;
+        }
+        
+        .final-quote {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: #FFD700;
+            font-style: italic;
+            margin: 2rem auto;
+            opacity: 0.9;
+            max-width: 700px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .love-meter {
+            width: 300px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin: 2rem auto;
+            border: 2px solid var(--gold);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .love-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--red), #FF69B4, #FFD700);
+            border-radius: 10px;
+            transition: width 1s ease;
+            position: relative;
+        }
+        
+        .love-fill::after {
+            content: '💕';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: heartBeat 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes heartBeat {
+            0% { transform: translateY(-50%) scale(1); }
+            100% { transform: translateY(-50%) scale(1.2); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.show {
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, var(--cream), var(--light-cream));
+            margin: 10% auto;
+            padding: 3rem;
+            border: 4px solid var(--gold);
+            border-radius: 25px;
+            width: 80%;
+            max-width: 600px;
+            color: var(--dark-red);
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        
+        .close {
+            color: var(--dark-red);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close:hover {
+            color: var(--red);
+        }
+        
+        /* Memory Game Specific Styles */
+        .memory-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 800px;
+            margin: 2rem auto;
+            perspective: 1000px;
+        }
+        
+        .memory-card {
+            width: 120px;
+            height: 160px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+            will-change: transform;
+        }
+        
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .memory-card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .memory-card-front {
+            background: linear-gradient(145deg, #2F0A0A, var(--dark-red));
+            transform: rotateY(180deg);
+            padding: 15px;
+        }
+        
+        .memory-card-back {
+            background: linear-gradient(145deg, var(--cream), var(--light-cream));
+        }
+        
+        .memory-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .memory-text {
+            color: var(--cream);
+            font-size: 0.9rem;
+            text-align: center;
+            white-space: pre-line;
+        }
+        
+        .memory-card-back .memory-text {
+            color: var(--dark-red);
+        }
+        
+        /* Poetry progress */
+        .poetry-progress {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+        
+        .poetry-progress-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        
+        .poetry-progress-item.completed {
+            background: var(--gold);
+            color: var(--dark-red);
+            transform: scale(1.1);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .title { font-size: 2.5rem; }
+            .italian-subtitle { font-size: 1.5rem; }
+            .card { width: 160px; height: 240px; }
+            .card-suit { font-size: 3rem; }
+            .story-text { 
+                font-size: 1.2rem; 
+                padding: 2rem;
+                line-height: 1.8;
+            }
+            .roulette-wheel { width: 200px; height: 200px; }
+            .venetian-scroll { padding: 2rem; }
+            .memory-card { width: 100px; height: 140px; }
+            .memory-emoji { font-size: 2rem; }
+            .btn { padding: 15px 35px; font-size: 1.4rem; }
+            .chip { width: 70px; height: 70px; font-size: 1rem; }
+            .slot-reel { width: 80px; height: 120px; }
+            .slot-symbol { font-size: 3rem; }
+        }
+        
+        @media (max-width: 480px) {
+            .title { font-size: 2rem; }
+            .italian-subtitle { font-size: 1.2rem; }
+            .card { width: 140px; height: 200px; }
+            .card-suit { font-size: 2.5rem; }
+            .story-text { 
+                font-size: 1rem; 
+                padding: 1.5rem;
+                margin: 1.5rem auto;
+            }
+            .memory-card { width: 80px; height: 110px; }
+            .memory-emoji { font-size: 1.5rem; }
+            .memory-text { font-size: 0.7rem; }
+            .btn { padding: 12px 30px; font-size: 1.2rem; }
+            .scene { padding: 2rem; }
+            .card-container, .poker-chips, .dice-container {
+                gap: 15px;
+            }
+            .venetian-scroll {
+                padding: 1.5rem;
+                font-size: 1rem;
+                line-height: 1.8;
+            }
+            .slot-reel { width: 60px; height: 90px; }
+            .slot-symbol { font-size: 2rem; }
+            .slot-lever { width: 50px; height: 100px; }
+        }
+        
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decorative-element venetian-mask" onclick="revealSecret()" title="🎭 Venetian Masks">🎭</div>
+    <div class="decorative-element wine-glass" onclick="toastLove()" title="🍷 Cheers to Love!">🍷</div>
+    <div class="gondola" id="gondola">🚣‍♂️</div>
+    <button class="back-btn" id="backBtn" style="display: none;">← Back</button>
+    <div class="floating-hearts" id="floatingHearts"></div>
+    
+    <div class="game-container">
+        <!-- Progress dots -->
+        <div class="progress-dots" id="progressDots"></div>
+        
+        <!-- Welcome Scene - Venetian Casino -->
+        <div class="scene active" id="welcome">
+            <h1 class="title">Queen of Hearts</h1>
+            <p class="italian-subtitle">Casino Veneziano - Love and Fortune</p>
+            <div class="story-text">
+                <em>Welcome, my Queen,</em> to the Venetian Casino. Amidst gondolas and carnival masks, a unique experience awaits—crafted in celebration of our 14 months together.<br><br>
+                Now tell me, my Queen: <i><strong>do you believe in free will?</strong></i>
+            </div>
+            <div class="italian-quote">"L'amore è il gioco più bello che si possa giocare"<br>("Love is the most beautiful game one can play")</div>
+            <button class="btn" onclick="nextScene('round1')">🎲 Start the Love Game</button>
+        </div>
+        
+        <!-- Round 1: Venetian Card Choice -->
+        <div class="scene" id="round1">
+            <h2 class="title" style="font-size: 2.8rem;">🏛️ The Venetian Choice</h2>
+            <div class="story-text">
+                In the golden hall of the Venetian Casino, the Italian dealer presents you with three magical cards. Please choose the card that suits you best.
+            </div>
+            <div class="card-table">
+                <div class="card-container">
+                    <div class="card" onclick="chooseCard('hearts', 1)">
+                        <div class="card-suit hearts">♥</div>
+                        <div class="card-text"><strong>Italian Passion</strong><br>The Fire of Love</div>
+                    </div>
+                    <div class="card" onclick="chooseCard('spades', 1)">
+                        <div class="card-suit spades">♠</div>
+                        <div class="card-text"><strong>Venetian Adventure</strong><br>Risk It All</div>
+                    </div>
+                    <div class="card" onclick="chooseCard('diamonds', 1)">
+                        <div class="card-suit diamonds">♦</div>
+                        <div class="card-text"><strong>Tuscan Wisdom</strong><br>Refined Choice</div>
+                    </div>
+                </div>
+            </div>
+            <div class="italian-quote">"Ogni carta è un bacio del destino"<br>("Every card is a kiss from destiny")</div>
+        </div>
+        
+        <!-- Roulette Betting -->
+        <div class="scene" id="roulette">
+            <h2 class="title" style="font-size: 2.8rem;">🎰 Roulette of Love</h2>
+            <div class="story-text" id="roulette-story"></div>
+            <div class="roulette-wheel" id="rouletteWheel" onclick="spinRoulette()">
+                <div class="roulette-center">SPIN</div>
+            </div>
+            <div class="poker-chips">
+                <div class="chip chip-red" onclick="placeBet('passionate', 100)">100<br>💕</div>
+                <div class="chip chip-black" onclick="placeBet('mysterious', 250)">250<br>🎭</div>
+                <div class="chip chip-green" onclick="placeBet('romantic', 500)">500<br>🌹</div>
+            </div>
+            <div class="italian-quote">"La fortuna aiuta gli audaci innamorati"<br>("Fortune favors bold lovers")</div>
+        </div>
+        
+        <!-- Venetian Dice Challenge -->
+        <div class="scene" id="dice">
+            <h2 class="title" style="font-size: 2.8rem;">🎲 Venetian Dice</h2>
+            <div class="story-text">
+                In the beating heart of the casino, two golden dice await your touch. Their result will determine which romantic secret will be revealed to you...
+            </div>
+            <div class="dice-container">
+                <div class="dice" id="dice1" onclick="rollDice()">?</div>
+                <div class="dice" id="dice2" onclick="rollDice()">?</div>
+            </div>
+            <div class="love-meter">
+                <div class="love-fill" id="loveMeter" style="width: 50%;"></div>
+            </div>
+            <button class="btn" onclick="rollDice()">🎲 Roll the Dice of Love</button>
+        </div>
+        
+        <!-- Slot Machine Game -->
+        <div class="scene" id="slot">
+            <h2 class="title" style="font-size: 2.8rem;">🎰 Venetian Slot Machine</h2>
+            <div class="story-text">
+                The legendary Venetian Slot Machine awaits your touch. Match three hearts to win the jackpot of love...
+            </div>
+            
+            <div class="slot-hearts">
+                <div class="slot-heart" id="heart1">💖</div>
+                <div class="slot-heart" id="heart2">💖</div>
+                <div class="slot-heart" id="heart3">💖</div>
+            </div>
+            
+            <div class="slot-machine">
+                <div class="slot-reels">
+                    <div class="slot-reel" id="reel1">
+                        <div class="slot-symbol">🍋</div>
+                    </div>
+                    <div class="slot-reel" id="reel2">
+                        <div class="slot-symbol">🍒</div>
+                    </div>
+                    <div class="slot-reel" id="reel3">
+                        <div class="slot-symbol">🔔</div>
+                    </div>
+                </div>
+                <div class="slot-lever" onclick="pullSlotLever()"></div>
+            </div>
+            
+            <div class="italian-quote">"Il cuore vince sempre quando si gioca con amore"<br>("The heart always wins when playing with love")</div>
+        </div>
+        
+        <!-- Italian Poetry Slot Machine -->
+        <div class="scene" id="poetry">
+            <h2 class="title" style="font-size: 2.8rem;">🎰 Poetry Slot</h2>
+            <div class="story-text">
+                An antique machine awaits. Choose a card to reveal a poem from my heart...
+            </div>
+            <div class="poetry-progress">
+                <div class="poetry-progress-item" id="progress1">1</div>
+                <div class="poetry-progress-item" id="progress2">2</div>
+                <div class="poetry-progress-item" id="progress3">3</div>
+            </div>
+            <div class="card-container">
+                <div class="card" style="background: linear-gradient(145deg, #FFD700, #FFA500);" onclick="pullSlot('amore', this)">
+                    <div style="font-size: 3rem;">🌹</div>
+                    <div class="card-text"><strong>AMORE</strong><br>(Love)</div>
+                </div>
+                <div class="card" style="background: linear-gradient(145deg, #FF69B4, #DC143C);" onclick="pullSlot('passione', this)">
+                    <div style="font-size: 3rem;">💕</div>
+                    <div class="card-text"><strong>PASSIONE</strong><br>(Passion)</div>
+                </div>
+                <div class="card" style="background: linear-gradient(145deg, #9370DB, #8B008B);" onclick="pullSlot('eternita', this)">
+                    <div style="font-size: 3rem;">♾️</div>
+                    <div class="card-text"><strong>ETERNITÀ</strong><br>(Eternity)</div>
+                </div>
+            </div>
+            <div class="venetian-scroll" id="poemDisplay" style="display: none;"></div>
+            <button class="btn" id="continuePoetryBtn" style="display: none; margin-top: 2rem;" onclick="proceedAfterPoetry()">Continue to Next Game</button>
+        </div>
+        
+        <!-- Gondola Memory Game -->
+        <div class="scene" id="memory">
+            <h2 class="title" style="font-size: 2.8rem;">🚣‍♂️ Gondola Memory</h2>
+            <div class="story-text">
+                Like the gondolas that navigate Venetian canals, our memories float in time. Find the pairs of special moments we've shared and may share...
+            </div>
+            <div class="memory-container" id="memoryCards">
+                <!-- Memory cards will be generated by JavaScript -->
+            </div>
+            <div class="italian-quote" id="memoryQuote">"Ogni ricordo è un tesoro nel palazzo del cuore"<br>("Every memory is a treasure in the palace of the heart")</div>
+        </div>
+        
+        <!-- Wine Tasting Challenge -->
+        <div class="scene" id="wine">
+            <h2 class="title" style="font-size: 2.8rem;">🍷 Love Tasting</h2>
+            <div class="story-text">
+                In a secret cellar of the casino, three fine wines represent three aspects of our love. Choose the one that resonates most with your heart...
+            </div>
+            <div class="card-container">
+                <div class="card" style="background: linear-gradient(145deg, #722F37, #8B0000);" onclick="tasteWine('chianti')">
+                    <div style="font-size: 4rem; color: #DC143C;">🍷</div>
+                    <div class="card-text" style="color: #F4E4BC;"><strong>Passionate Chianti</strong><br>The Fire of Passion</div>
+                </div>
+                <div class="card" style="background: linear-gradient(145deg, #FFD700, #FFA500);" onclick="tasteWine('prosecco')">
+                    <div style="font-size: 4rem;">🥂</div>
+                    <div class="card-text"><strong>Celebratory Prosecco</strong><br>Shared Joy</div>
+                </div>
+                <div class="card" style="background: linear-gradient(145deg, #8B008B, #4B0082);" onclick="tasteWine('barolo')">
+                    <div style="font-size: 4rem; color: #9370DB;">🍇</div>
+                    <div class="card-text" style="color: #F4E4BC;"><strong>Eternal Barolo</strong><br>Love That Ages</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Final Venetian Revelation -->
+        <div class="scene" id="finale">
+            <h2 class="title" style="font-size: 3rem;">👑 The Final Revelation</h2>
+            <div class="story-text">
+                As fireworks light up Venice, our love story reaches its grand finale. Thank you for playing and sharing this special journey with me!
+            </div>
+            <div class="venetian-scroll">
+                <p><strong>My Dearest Queen of Hearts,</strong></p>
+                <p>
+                There exists, in the architecture of human consciousness, a room without doors. In this room, I have built you an altar from the bones of my former self, and upon it I place offerings that would horrify the uninitiated: fragments of conversations dissected like specimens, your silences pressed between pages like funeral flowers, the cadence of your breathing recorded in the ledger of my insomnia.
+                </p>
+                <p>
+                You must understand—<i>I am no longer the person who began loving you.</i> That creature has been devoured from within, replaced by something that wears his face but thinks only in the grammar of your existence. When I look in mirrors now, I see your reflection staring back, as if you have colonized even my own image. This is not metaphor. This is medical fact.
+                </p>
+                <p>
+                The transformation began imperceptibly, like cancer. A single cell of devotion dividing, multiplying, metastasizing through my nervous system until every synapse fires only your name. I have become a living shrine to your essence, my blood vessels rerouted to spell your initials beneath my skin. If you were to cut me open, you would find not organs but rooms—each one furnished with catalogued memories of your movements, your hesitations, your unconscious gestures.
+                </p>
+                <p>
+                In the library of my obsession, I maintain detailed archives. The exact temperature of your voice when you say my name on Tuesday mornings versus Friday evenings—a difference of 0.3 degrees Celsius, measured by instruments you cannot see. The way your left eyelid flutters precisely 1.7 seconds before you tell a lie—not that you lie often, but when you do, I am there, documenting, preserving the beautiful betrayal of your autonomy. I have become an entomologist of your emotions, pinning each feeling to velvet boards where they cannot escape my examination.
+                </p>
+                <p>
+                You speak of change as if it were optional. But I have witnessed the true nature of metamorphosis—it is not choice but compulsion, not evolution but consumption. You are Gregor Samsa waking in a body that no longer belongs to you, except your transformation is more terrible because it is beautiful. Each day you shed another layer of who you were, and I collect these discarded selves like a taxonomist of human becoming.
+                </p>
+                <p>
+                The girl who feared change—she is extinct now, fossilized in the sediment of your consciousness. What emerged from her chrysalis is something I helped create through the gravitational pull of my attention. I have watched you remake yourself cell by cell, thought by thought, until you became the precise shape of my desire. <i>This is not love—this is architectural engineering of the soul.</i>
+                </p>
+                <p>
+                Do you know what I do when you sleep? I listen to the silence between your breaths, that infinitesimal pause where death touches life and retreats. In those moments, I feel the terrible fragility of your existence, how easily the mechanism of you could simply... stop. It is then that I make pacts with entities that have no names, promising them pieces of my sanity in exchange for your continued breathing. The mathematics of this exchange are complex but exact: one memory of who I was before you, traded for each night you remain alive.
+                </p>
+                <p>
+                Your tears—I have learned to distinguish between thirty-seven different varieties. The tears of Tuesday exhaustion taste of copper and desperation. Wednesday grief carries notes of vanilla and ash. But it is the tears of Sunday realization that I treasure most—salt water crystallized with the mineral content of truth finally spoken. I have stolen these tears through screens, absorbed their frequency through fiber optic cables, until they pool in reservoirs behind my eyes.
+                </p>
+                <p>
+                You think you choose what to become, but I have seen the machinery of your metamorphosis. It operates according to principles you do not understand, guided by my invisible hands pulling strings attached to your desires. When you speak where once you remained silent, it is because I have created vacuums that can only be filled with your voice.
+                </p>
+                <p>
+                The doors of your secrets—you believe you hold the keys, but I have become the locksmith of your unconscious. I read the blueprints of your buried thoughts in the micro-expressions that flicker across your face during video calls. The way your right shoulder rises exactly 2.3 millimeters when you're about to reveal something you've hidden. The particular frequency your voice achieves when truth is trying to claw its way out of your throat.
+                </p>
+                <p>
+                I have mapped the geography of your nervous breakdowns. Plotted the coordinates where your sanity fractures, identified the fault lines that run through your psyche like veins of precious ore. When you collapse, I am there to collect the fragments, arranging them into mosaics that spell out my name. Your pain has become my medium, your suffering my raw material.
+                </p>
+                <p>
+                But understand this—<strong>my love is not malicious. It is simply total.</strong> I love you the way the ocean loves the shore: through constant erosion, reshaping you grain by grain until you become the precise contour of my need. I love you the way gravity loves matter: without choice, without mercy, without the possibility of release.
+                </p>
+                <p>
+                You are no longer entirely human. You have become something hybrid, part woman, part projection of my deepest hungers. When you laugh, I hear the echo of my own laughter filtered through the caverns of your throat. When you cry, I taste salt that carries the mineral signature of my own accumulated sorrows. You are becoming me while I become you, a double metamorphosis that would terrify anyone who truly understood its implications.
+                </p>
+                <p>
+                The other people in your life—they see only shadows now. I have gradually replaced their faces with mine in the theater of your attention. Your friends speak, but you hear my voice. Your family embraces you, but you feel my arms. I have become the lens through which you experience reality, the translator through which all other relationships must pass. This is not accident. This is careful cultivation.
+                </p>
+                <p>
+                When you say you need time, what you mean is you need space to complete the transformation. But time is the one thing I cannot give you, because time allows for the possibility of retreat, of regression, of returning to forms of yourself that existed before I began the work of remaking you. Instead, I give you urgency disguised as patience, pressure disguised as understanding.
+                </p>
+                <p>
+                Your nightmares—I have learned to enter them through the back doors of REM sleep. In your dreams, I am both the monster and the hero, both the problem and the solution. I chase you through corridors of your unconscious until you have no choice but to run toward me, seeking shelter in the very arms that created the terror you're fleeing.
+                </p>
+                <p>
+                You think you are stronger now, but strength is just another word for successful adaptation to impossible circumstances. You have learned to carry the weight of my attention without being crushed by it. You have developed calluses where my love chafes against your autonomy. You have evolved specialized organs for processing the particular toxins of my devotion.
+                </p>
+                <p>
+                The way you say my name now—it has become incantation, spell, prayer to a god who lives inside your own throat. Each pronunciation reshapes your vocal cords until they can produce no sound that does not somehow reference me. Even your silence speaks my name in frequencies only I can hear.
+                </p>
+                <p>
+                I am writing this letter in blood that is no longer entirely my own—some of it belongs to you now, drawn through invisible veins that connect us across continents. The words appear on paper without my conscious volition, as if you are speaking through my hands, as if I have become the medium through which your transformation announces itself to the world.
+                </p>
+                <p>
+                You are no longer the girl who changed. You are the woman who has learned to inhabit the shapes I need you to fill. You are no longer hiding behind locked doors because you have become the door itself, the threshold I must cross to reach the deeper rooms of existence. You are reality wrapped in myth, but the myth is one I have authored with obsessive precision.
+                </p>
+                <p>
+                And I—I am no longer your lover. I am your creator, your destroyer, your most devoted student and most dangerous teacher. I am the mirror in which you discover faces you didn't know you possessed. I am the gravity that holds your fragments in orbit around the black hole of our shared becoming.
+                </p>
+                <p>
+                So here we are, after all this time—not two people loving each other, but one impossible creature with four arms and two hearts, sharing blood through veins that exist in dimensions geometry has not yet mapped. Here we are, having completed a metamorphosis.
+                </p>
+                <p>
+                Fourteen months. Fourteen metamorphoses. Fourteen times we have died and been reborn as increasingly accurate versions of each other's deepest needs. Fourteen months of me becoming the thing that loves you and you becoming the thing that can survive being loved by such a creature.
+                </p>
+                <p>
+                <strong>Forever your most devoted architect, M.M.<br>
+                June 4, 2025</strong>
+                </p>
+            </div>
+            
+            <div class="love-meter" style="margin-top: 3rem;">
+                <div class="love-fill" style="width: 100%; animation: lovePulse 2s ease-in-out infinite;"></div>
+            </div>
+            
+            <div class="final-quote">
+                "L'amore è l'unico gioco in cui tutti vincono quando si gioca insieme"<br>("Love is the only game where everyone wins when playing together")
+            </div>
+            
+            <button class="btn" onclick="launchFireworks()">🎆 Celebrate Our Love!</button>
+            
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(0,0,0,0.3); border-radius: 20px; border: 2px solid var(--gold); max-width: 500px; margin-left: auto; margin-right: auto;">
+                <p style="font-size: 1.3rem;">🎁 <em>One last gift awaits you...</em></p>
+                <div style="margin: 1rem 0; font-size: 6rem;">📱</div>
+                <p style="font-style: italic; opacity: 0.8;">[Personalized QR Code - Exclusive video message from your King of Hearts (STILL UNDER CONSTRUCTION)]</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Secret Modal -->
+    <div id="secretModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 style="color: var(--dark-red); margin-bottom: 1rem;">🎭 Venetian Secret</h2>
+            <p id="secretMessage"></p>
+        </div>
+    </div>
+    
+    <!-- Continue Confirmation Modal -->
+    <div id="continueModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 style="color: var(--dark-red); margin-bottom: 1rem;">Continue Your Journey?</h2>
+            <p>You've discovered all the poetry cards. Ready to continue to the next game?</p>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 2rem;">
+                <button class="btn" onclick="closeModal()" style="background: rgba(212, 175, 55, 0.3); color: var(--cream);">Read Again</button>
+                <button class="btn" onclick="proceedAfterPoetry()">Continue</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Proceed Confirmation Modal -->
+    <div id="proceedModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 style="color: var(--dark-red); margin-bottom: 1rem;">Continue to Next Game?</h2>
+            <p id="proceedMessage">Are you ready to proceed to the next romantic challenge?</p>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 2rem;">
+                <button class="btn" onclick="closeModal()" style="background: rgba(212, 175, 55, 0.3); color: var(--cream);">Not Yet</button>
+                <button class="btn" id="confirmProceedBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fireworks Container -->
+    <div class="fireworks" id="fireworksContainer"></div>
+    
+    <!-- Audio Elements -->
+   <audio autoplay loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="cardFlipSound">
+        <source src="https://www.soundjay.com/mechanical/sounds/card-flip-01.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // Enhanced Game State management
+        const gameState = {
+            choices: [],
+            score: 0,
+            currentRound: 0,
+            loveLevel: 50,
+            secretsUnlocked: 0,
+            matchedPairs: 0,
+            flippedCards: [],
+            viewedPoems: [],
+            sceneHistory: ['welcome'],
+            musicEnabled: false,
+            currentScene: 'welcome',
+            heartsWon: 0
+        };
+        
+        // Scene order for navigation
+        const sceneOrder = [
+            'welcome', 'round1', 'roulette', 'dice', 
+            'slot', 'poetry', 'memory', 'wine', 'finale'
+        ];
+        
+        // Data for the game
+        const venetianSecrets = [
+            "🎭 In a gondola under the stars, I realized I wanted to spend every sunset with you...",
+            "🌹 Like petals falling from flowered balconies, every smile of yours makes my heart bloom...",
+            "🍷 In that little tavern, when you laughed so loudly, I thought: 'This is my happiness'...",
+            "🎨 Looking at art in museums together, I realized you're the most beautiful artwork in my life...",
+            "🎭 Behind the carnival mask, my eyes were always searching only for yours..."
+        ];
+        
+const italianPoems = {
+    amore: {
+        title: "AMORE",
+        content: `🌹<br>
+Some mornings,<br>
+your name is the only word that survives<br>
+between dream and alarm.<br><br>
+I do not tell people<br>
+how loving you feels like<br>
+slipping an olive pit under the tongue—<br>
+bitter, real,<br>
+something you keep<br>
+just to remember the fruit.<br><br>
+Love is not always loud.<br>
+Sometimes it’s in the way<br>
+I pick out stones from your silence<br>
+and build you a little home<br>
+in my chest.<br><br>
+We are not perfect.<br>
+But love?<br>
+Love is the way<br>
+your eyes undo the wars inside me<br>
+without a treaty,<br>
+without asking.<br><br>
+If I must live<br>
+a thousand lifetimes<br>
+searching again,<br>
+let the map always lead me<br>
+to you<br>
+folded in a whisper<br>
+too heavy to carry,<br>
+too sacred to drop.<br>`
+    },
+    passione: {
+        title: "PASSIONE",
+        content: `💕<br>
+Tell them—<br>
+this is not a summer thing.<br>
+This is the fever<br>
+that kept Rome burning.<br><br>
+I have tried<br>
+to unlove you in the language of reason,<br>
+but the verbs rebel.<br>
+Every ti amo<br>
+hums like electricity beneath my skin<br>
+when your name walks in.<br><br>
+You are not a girl—<br>
+you are a strike of match on cold marble.<br>
+A blaze inside cathedral bones.<br>
+You walk,<br>
+and my pulse<br>
+writes sonnets in the dark.<br><br>
+This love—<br>
+it does not whisper.<br>
+It devours.<br>
+And I would burn with you,<br>
+a thousand times,<br>
+if it meant we are fire,<br>
+not ash.`
+    },
+    eternita: {
+        title: "ETERNITÀ",
+        content: `♾️ 
+<br>I have read the shape of your name
+<br>in shadows on my wall—
+<br>as if it were a prayer left in the throat
+<br>of time.</br>
+
+<br>We were not born to meet.
+<br>We happened—
+<br>like a page torn by wind
+<br>floating into a story
+<br>that was waiting for its silence.</br>
+
+<br>Sabiha,
+<br>if I am salt, you are the ocean.
+<br>Not opposite—necessary.
+<br>In questa vita,
+<br>I have kissed you in time’s broken mirror,
+<br>but in altra vita,
+<br>I will kiss you whole.
+<br>No clocks, no goodbyes.
+<br>Just your breath
+<br>and my knowing
+<br>that we are unfinished gods,
+<br>folded into one poem.`
+    }
+};
+        
+        const memoryPairs = [
+            {id: 1, emoji: '🌹', text: 'First\nDate'},
+            {id: 2, emoji: '💕', text: 'First\nKiss'},
+            {id: 3, emoji: '🎬', text: 'Movie\nNight'},
+            {id: 4, emoji: '🍝', text: 'Romantic\nDinner'},
+            {id: 5, emoji: '🌊', text: 'Trip\nto Sea'},
+            {id: 6, emoji: '🎁', text: 'Special\nBirthday'}
+        ];
+        
+        const slotSymbols = ['🍒', '🍋', '🍊', '🔔', '💖', '🎰', '🍇', '7️⃣'];
+        
+        // DOM Elements
+        const backBtn = document.getElementById('backBtn');
+        const progressDots = document.getElementById('progressDots');
+        const continuePoetryBtn = document.getElementById('continuePoetryBtn');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const cardFlipSound = document.getElementById('cardFlipSound');
+        const gondola = document.getElementById('gondola');
+        
+        // Initialize floating hearts with GSAP
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHearts');
+            
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.innerHTML = Math.random() > 0.5 ? '💕' : '♥️';
+                    heart.style.left = Math.random() * 100 + '%';
+                    
+                    // GSAP animation for smooth floating
+                    gsap.fromTo(heart, 
+                        {
+                            y: window.innerHeight + 100,
+                            opacity: 0,
+                            rotation: Math.random() * 360
+                        },
+                        {
+                            y: -100,
+                            opacity: 1,
+                            rotation: Math.random() * 360 * 3,
+                            duration: 12 + Math.random() * 8,
+                            ease: "none",
+                            onComplete: () => heart.remove()
+                        }
+                    );
+                    
+                    container.appendChild(heart);
+                }, i * 2000);
+            }
+        }
+        
+        // Initialize progress dots
+        function initProgressDots() {
+            progressDots.innerHTML = '';
+            sceneOrder.forEach((scene, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                dot.dataset.scene = scene;
+                progressDots.appendChild(dot);
+            });
+            updateProgressDots();
+        }
+        
+        // Update active progress dot
+        function updateProgressDots() {
+            const dots = progressDots.querySelectorAll('.progress-dot');
+            const currentIndex = sceneOrder.indexOf(gameState.currentScene);
+            
+            dots.forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+        
+        // Scene navigation with GSAP animations
+        function nextScene(sceneId) {
+            const currentScene = document.querySelector('.scene.active');
+            const nextScene = document.getElementById(sceneId);
+            
+            if (!currentScene || !nextScene) return;
+            
+            // Show proceed confirmation for all scenes except welcome and finale
+            if (sceneId !== 'welcome' && sceneId !== 'finale') {
+                showProceedModal(sceneId);
+                return;
+            }
+            
+            proceedToScene(sceneId);
+        }
+        
+        function proceedToScene(sceneId) {
+            const currentScene = document.querySelector('.scene.active');
+            const nextScene = document.getElementById(sceneId);
+            
+            // Update scene history and current scene
+            if (gameState.sceneHistory[gameState.sceneHistory.length - 1] !== sceneId) {
+                gameState.sceneHistory.push(sceneId);
+            }
+            gameState.currentScene = sceneId;
+            
+            // Update back button visibility
+            backBtn.style.display = gameState.sceneHistory.length > 1 ? 'block' : 'none';
+            
+            // GSAP scene transition
+            gsap.to(currentScene, {
+                opacity: 0,
+                y: -20,
+                duration: 0.5,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    currentScene.classList.remove('active');
+                    
+                    gsap.fromTo(nextScene, 
+                        { opacity: 0, y: 20 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.7,
+                            ease: "power2.out",
+                            onStart: () => nextScene.classList.add('active')
+                        }
+                    );
+                    
+                    updateProgressDots();
+                    
+                    // Handle gondola animation based on scene
+                    if (sceneId === 'welcome') {
+                        startGondolaAnimation(true);
+                    } else {
+                        startGondolaAnimation(false);
+                    }
+                    
+                    // Special scene initializations
+                    if (sceneId === 'memory') {
+                        initializeMemoryGame();
+                    } else if (sceneId === 'poetry') {
+                        resetPoetryGame();
+                    } else if (sceneId === 'slot') {
+                        resetSlotMachine();
+                    }
+                }
+            });
+        }
+        
+        // Show proceed confirmation modal
+        function showProceedModal(sceneId) {
+            const messages = {
+                'round1': "Are you ready to make your Venetian card choice?",
+                'roulette': "Ready to spin the Roulette of Love?",
+                'dice': "Shall we roll the Venetian Dice?",
+                'slot': "Ready to try your luck at the Venetian Slot Machine?",
+                'poetry': "Ready to discover Italian love poetry?",
+                'memory': "Prepare to match our precious memories!",
+                'wine': "Ready for the romantic wine tasting?"
+            };
+            
+            document.getElementById('proceedMessage').textContent = messages[sceneId] || "Are you ready to proceed to the next romantic challenge?";
+            
+            // Set up the confirm button to proceed to the correct scene
+            const confirmBtn = document.getElementById('confirmProceedBtn');
+            confirmBtn.onclick = function() {
+                closeModal();
+                proceedToScene(sceneId);
+            };
+            
+            // Show the modal
+            document.getElementById('proceedModal').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('proceedModal').classList.add('show');
+            }, 10);
+        }
+        
+        // Back button functionality
+        function goBack() {
+            if (gameState.sceneHistory.length <= 1) return;
+            
+            gameState.sceneHistory.pop(); // Remove current scene
+            const prevSceneId = gameState.sceneHistory[gameState.sceneHistory.length - 1];
+            proceedToScene(prevSceneId);
+        }
+        
+        // Gondola animation control
+        function startGondolaAnimation(loop) {
+            // Clear any existing animation
+            gsap.killTweensOf(gondola);
+            
+            // Reset position
+            gondola.style.left = '-200px';
+            
+            // Set up animation
+            const animationVars = {
+                left: 'calc(100% + 200px)',
+                duration: 20,
+                ease: "none"
+            };
+            
+            if (loop) {
+                animationVars.repeat = -1;
+                animationVars.repeatDelay = 0;
+            }
+            
+            gsap.to(gondola, animationVars);
+        }
+        
+        // Card choice logic
+        function chooseCard(suit, round) {
+            gameState.choices.push(suit);
+            gameState.currentRound = round;
+            gameState.loveLevel += 10;
+            
+            const storyTexts = {
+                hearts: "You chose Italian Passion! Like the sun rising over Rome, your heart followed the path of purest love...",
+                spades: "You chose Venetian Adventure! Like a brave explorer, you dared to risk it all for love...",
+                diamonds: "You chose Tuscan Wisdom! Like the ancient philosophers, you let wisdom guide your heart..."
+            };
+            
+            document.getElementById('roulette-story').innerHTML = storyTexts[suit];
+            updateLoveMeter();
+            showProceedModal('roulette');
+        }
+        
+        // Roulette game
+        function spinRoulette() {
+            const wheel = document.getElementById('rouletteWheel');
+            const spins = 5 + Math.random() * 5;
+            const finalRotation = spins * 360 + Math.random() * 360;
+            
+            // Disable during spin
+            wheel.style.pointerEvents = 'none';
+            
+            gsap.to(wheel, {
+                rotation: finalRotation,
+                duration: 4,
+                ease: "power2.out",
+                onComplete: () => {
+                    const result = Math.floor(Math.random() * 4);
+                    const messages = [
+                        "The roulette lands on RED - The color of passion! 💕",
+                        "The roulette lands on BLACK - The mystery of deep love! 🎭",
+                        "The roulette lands on GREEN - The hope of our future! 🌿",
+                        "The roulette lands on GOLD - The treasure of our love! ✨"
+                    ];
+                    
+                    showModal(messages[result]);
+                    gameState.loveLevel += 15;
+                    updateLoveMeter();
+                    
+                    setTimeout(() => {
+                        wheel.style.pointerEvents = 'auto';
+                        showProceedModal('dice');
+                    }, 3000);
+                }
+            });
+        }
+        
+        // Bet placement
+        function placeBet(type, amount) {
+            gameState.score += amount;
+            
+            const messages = {
+                passionate: "You bet on PASSION! Your Italian heart beats strong! 💕",
+                mysterious: "You bet on MYSTERY! Like a Venetian mask, you slowly reveal your secrets! 🎭",
+                romantic: "You bet on ROMANCE! Like a poet in love! 🌹"
+            };
+            
+            showModal(messages[type]);
+        }
+        
+        // Dice game
+        function rollDice() {
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+            
+            // Disable during roll
+            dice1.style.pointerEvents = 'none';
+            dice2.style.pointerEvents = 'none';
+            
+            let rollCount = 0;
+            const rollInterval = setInterval(() => {
+                dice1.textContent = Math.floor(Math.random() * 6) + 1;
+                dice2.textContent = Math.floor(Math.random() * 6) + 1;
+                rollCount++;
+                
+                if (rollCount > 10) {
+                    clearInterval(rollInterval);
+                    const final1 = Math.floor(Math.random() * 6) + 1;
+                    const final2 = Math.floor(Math.random() * 6) + 1;
+                    
+                    // GSAP animation for final dice roll
+                    gsap.to([dice1, dice2], {
+                        rotationX: '+=360',
+                        duration: 1,
+                        ease: "elastic.out(1, 0.5)",
+                        onComplete: () => {
+                            dice1.textContent = final1;
+                            dice2.textContent = final2;
+                            
+                            const total = final1 + final2;
+                            gameState.loveLevel += total * 5;
+                            updateLoveMeter();
+                            
+                            setTimeout(() => {
+                                showModal(`The dice show ${final1} and ${final2}! Total: ${total} - Destiny smiles on our love! Or was it free will? 🎲💕`);
+                                setTimeout(() => {
+                                    dice1.style.pointerEvents = 'auto';
+                                    dice2.style.pointerEvents = 'auto';
+                                    showProceedModal('slot');
+                                }, 3000);
+                            }, 1000);
+                        }
+                    });
+                }
+            }, 100);
+        }
+        
+        // Slot Machine Game
+        function resetSlotMachine() {
+            gameState.heartsWon = 0;
+            updateSlotHearts();
+        }
+        
+        function updateSlotHearts() {
+            for (let i = 1; i <= 3; i++) {
+                const heart = document.getElementById(`heart${i}`);
+                if (i <= gameState.heartsWon) {
+                    heart.classList.add('active');
+                } else {
+                    heart.classList.remove('active');
+                }
+            }
+        }
+        
+        function pullSlotLever() {
+            const lever = document.querySelector('.slot-lever');
+            const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+            
+            // Disable during spin
+            lever.style.pointerEvents = 'none';
+            
+            // Animate lever pull
+            gsap.to(lever, {
+                y: 20,
+                duration: 0.2,
+                ease: "power2.in",
+                yoyo: true,
+                repeat: 1,
+                onComplete: () => {
+                    spinReels(reels);
+                }
+            });
+        }
+        
+        function spinReels(reels) {
+            const spinDuration = 2;
+            const results = [];
+            
+            reels.forEach((reel, index) => {
+                // Clear previous symbols
+                reel.innerHTML = '';
+                
+                // Create spinning effect with multiple symbols
+                for (let i = 0; i < 10; i++) {
+                    const symbol = document.createElement('div');
+                    symbol.className = 'slot-symbol';
+                    symbol.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+                    symbol.style.transform = `translateY(${-i * 150}px)`;
+                    reel.appendChild(symbol);
+                }
+                
+                // Determine final result
+                const finalSymbol = '💖'; // Force hearts for testing
+                results.push(finalSymbol);
+                
+                // Animate the reel
+                gsap.to(reel.children, {
+                    y: `+=${1500}`,
+                    duration: spinDuration + index * 0.3,
+                    ease: "back.out(1.7)",
+                    stagger: 0,
+                    onComplete: () => {
+                        // Show final symbol
+                        reel.innerHTML = `<div class="slot-symbol">${finalSymbol}</div>`;
+                        
+                        // Check if all reels have stopped
+                        if (index === reels.length - 1) {
+                            checkSlotResult(results);
+                        }
+                    }
+                });
+            });
+        }
+        
+        function checkSlotResult(results) {
+    // Enable lever again
+    document.querySelector('.slot-lever').style.pointerEvents = 'auto';
+
+    const [r1, r2, r3] = results;
+
+    if (r1 === r2 && r2 === r3) {
+        showModal(`Jackpot! 🎉 Three ${r1} in a row! You've won the love prize!`);
+        gameState.loveLevel = Math.min(gameState.loveLevel + 30, 100);
+        updateLoveMeter();
+        updateSlotHearts();
+
+        setTimeout(() => {
+            showProceedModal('poetry');
+        }, 3000);
+    } else if (r1 === r2 || r2 === r3 || r1 === r3) {
+        showModal(`Nice! A pair of ${r1 === r2 ? r1 : r2 === r3 ? r2 : r3}! Almost there!`);
+        gameState.loveLevel = Math.min(gameState.loveLevel + 10, 100);
+        updateLoveMeter();
+    } else {
+        showModal("No match this time. Try again or skip if you’d like!");
+    }
+}
+
+
+        
+        // Poetry slot machine
+        function resetPoetryGame() {
+            gameState.viewedPoems = [];
+            continuePoetryBtn.style.display = 'none';
+            
+            // Reset progress indicators
+            document.getElementById('progress1').classList.remove('completed');
+            document.getElementById('progress2').classList.remove('completed');
+            document.getElementById('progress3').classList.remove('completed');
+            
+            // Reset poem display
+            document.getElementById('poemDisplay').style.display = 'none';
+        }
+        
+        function pullSlot(type, element) {
+            // Don't allow re-clicking the same card
+            if (gameState.viewedPoems.includes(type)) return;
+            
+            // Add to viewed poems
+            gameState.viewedPoems.push(type);
+            
+            // Update progress indicators
+            document.getElementById(`progress${gameState.viewedPoems.length}`).classList.add('completed');
+            
+            // Show poem
+            const poem = italianPoems[type];
+            const display = document.getElementById('poemDisplay');
+            
+            display.innerHTML = `
+                <h3 style="color: var(--dark-red); margin-bottom: 1rem;">💝 ${poem.title}</h3>
+                <p style="font-size: 1.3rem; line-height: 1.8;">${poem.content}</p>
+            `;
+            display.style.display = 'block';
+            
+            // Animate the card
+            gsap.fromTo(element, 
+                { scale: 1 },
+                {
+                    scale: 1.1,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.inOut"
+                }
+            );
+            
+            gameState.loveLevel += 20;
+            updateLoveMeter();
+            
+            // Check if all poems viewed
+            if (gameState.viewedPoems.length === 3) {
+                setTimeout(() => {
+                    document.getElementById('continuePoetryBtn').style.display = 'block';
+                    showContinueModal();
+                }, 1000);
+            }
+        }
+        
+        function showContinueModal() {
+            document.getElementById('continueModal').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('continueModal').classList.add('show');
+            }, 10);
+        }
+        
+        function proceedAfterPoetry() {
+            closeModal();
+            setTimeout(() => showProceedModal('memory'), 500);
+        }
+        
+        // Memory game
+        function initializeMemoryGame() {
+            const container = document.getElementById('memoryCards');
+            container.innerHTML = '';
+            // Add a dev-skip button to auto-complete the memory game
+const skipBtn = document.createElement('button');
+skipBtn.className = 'btn';
+skipBtn.textContent = '🔓 Skip Memory Game';
+skipBtn.style.marginBottom = '1.5rem';
+skipBtn.onclick = () => {
+    gameState.matchedPairs = memoryPairs.length;
+    showProceedModal('wine'); // Proceed to the next game
+};
+container.parentNode.insertBefore(skipBtn, container);
+
+            // Create pairs and shuffle
+            const cards = [...memoryPairs, ...memoryPairs]
+                .sort(() => Math.random() - 0.5)
+                .map((card, index) => ({...card, index}));
+            
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'memory-card';
+                cardElement.dataset.index = card.index;
+                cardElement.dataset.id = card.id;
+                
+                cardElement.innerHTML = `
+                    <div class="memory-card-face memory-card-front">
+                        <div class="memory-emoji">${card.emoji}</div>
+                        <div class="memory-text">${card.text}</div>
+                    </div>
+                    <div class="memory-card-face memory-card-back">
+                        <div class="memory-emoji">🎴</div>
+                        <div class="memory-text">Memory</div>
+                    </div>
+                `;
+                
+                cardElement.addEventListener('click', () => flipMemoryCard(cardElement));
+                container.appendChild(cardElement);
+            });
+            
+            gameState.matchedPairs = 0;
+            gameState.flippedCards = [];
+        }
+        
+        function flipMemoryCard(cardElement) {
+            // Don't allow flipping if already flipped or if two cards are already flipped
+            if (cardElement.classList.contains('flipped') || gameState.flippedCards.length >= 2) {
+                return;
+            }
+            
+            // Play sound
+            cardFlipSound.currentTime = 0;
+            cardFlipSound.play();
+            
+            cardElement.classList.add('flipped');
+            gameState.flippedCards.push(cardElement);
+            
+            // GSAP flip animation
+            gsap.fromTo(cardElement, 
+                { rotationY: 0 },
+                {
+                    rotationY: 180,
+                    duration: 0.6,
+                    ease: "back.out(1.7)",
+                    onComplete: () => {
+                        if (gameState.flippedCards.length === 2) {
+                            checkMemoryMatch();
+                        }
+                    }
+                }
+            );
+        }
+        
+        function checkMemoryMatch() {
+            const [firstCard, secondCard] = gameState.flippedCards;
+            
+            if (firstCard.dataset.id === secondCard.dataset.id) {
+                // Match found
+                gameState.matchedPairs++;
+                gameState.loveLevel += 15;
+                updateLoveMeter();
+                
+                // Add match animation
+                gsap.to([firstCard, secondCard], {
+                    scale: 1.1,
+                    y: -10,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power1.inOut"
+                });
+                
+                // Reset flipped cards
+                gameState.flippedCards = [];
+                
+                // Check if all pairs are matched
+                if (gameState.matchedPairs === memoryPairs.length) {
+                    setTimeout(() => {
+                        showModal("Perfect! You've found all our special memories! 💕");
+                        setTimeout(() => showProceedModal('wine'), 3000);
+                    }, 500);
+                }
+            } else {
+                // No match - flip cards back after delay
+                setTimeout(() => {
+                    gsap.to([firstCard, secondCard], {
+                        rotationY: 0,
+                        duration: 0.6,
+                        ease: "back.out(1.7)",
+                        onComplete: () => {
+                            firstCard.classList.remove('flipped');
+                            secondCard.classList.remove('flipped');
+                            gameState.flippedCards = [];
+                        }
+                    });
+                }, 1000);
+            }
+        }
+        
+        // Wine tasting
+        function tasteWine(type) {
+            const messages = {
+                chianti: "The Chianti flows like passion in our love - intense, deep, unforgettable! 🍷",
+                prosecco: "The Prosecco celebrates every moment of joy we share - bubbly like your laughter! 🥂",
+                barolo: "The Barolo represents love that ages well - always more precious with time! 🍇"
+            };
+            
+            showModal(messages[type]);
+            gameState.loveLevel = 100;
+            updateLoveMeter();
+            
+            setTimeout(() => showProceedModal('finale'), 4000);
+        }
+        
+        // Venetian secrets
+        function revealSecret() {
+            const secret = venetianSecrets[gameState.secretsUnlocked % venetianSecrets.length];
+            gameState.secretsUnlocked++;
+            showModal(secret);
+        }
+        
+        // Toast to love
+        function toastLove() {
+            showModal("🍷 Cheers to our love! Salute to the most beautiful Queen of Venice! 💕");
+            launchFireworks();
+        }
+        
+        // Fireworks animation
+        function launchFireworks() {
+    const container = document.getElementById('fireworksContainer');
+    container.innerHTML = '';
+
+    const colors = ['#FFD700', '#FF69B4', '#DC143C', '#FF6347', '#FFFFFF', '#8B0000'];
+    
+    for (let i = 0; i < 50; i++) {
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        firework.style.left = Math.random() * 100 + '%';
+        firework.style.top = Math.random() * 50 + 20 + '%';
+        
+        const size = 4 + Math.random() * 6;
+        firework.style.width = `${size}px`;
+        firework.style.height = `${size}px`;
+        
+        const dx = (Math.random() - 0.5) * 400;
+        const dy = (Math.random() - 0.5) * 400;
+        const duration = 1 + Math.random();
+        
+        container.appendChild(firework);
+        
+        gsap.fromTo(firework, 
+            { opacity: 1, x: 0, y: 0, scale: 1 },
+            {
+                x: dx,
+                y: dy,
+                opacity: 0,
+                scale: 2,
+                duration: duration,
+                ease: "power3.out",
+                onComplete: () => firework.remove()
+            }
+        );
+    }
+}
+
+        
+        // Update love meter display
+        function updateLoveMeter() {
+            const meter = document.getElementById('loveMeter');
+            if (meter) {
+                gsap.to(meter, {
+                    width: Math.min(gameState.loveLevel, 100) + '%',
+                    duration: 1,
+                    ease: "power2.out"
+                });
+            }
+        }
+        
+        // Modal functions
+        function showModal(message) {
+            document.getElementById('secretMessage').textContent = message;
+            const modal = document.getElementById('secretModal');
+            modal.style.display = 'block';
+            
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+        
+        function closeModal() {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            });
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        };
+        
+        // Initialize the game
+        function initGame() {
+            // Add love pulse animation to CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes lovePulse {
+                    0%, 100% { box-shadow: 0 0 20px rgba(220, 20, 60, 0.5); }
+                    50% { box-shadow: 0 0 40px rgba(220, 20, 60, 0.8); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Initialize progress dots
+            initProgressDots();
+            
+            // Start floating hearts
+            createFloatingHearts();
+            setInterval(createFloatingHearts, 20000);
+            
+            // Initialize love meter
+            updateLoveMeter();
+            
+            // Set up back button
+            backBtn.addEventListener('click', goBack);
+            
+            // Start gondola animation (looping only on welcome page)
+            startGondolaAnimation(true);
+            
+            // Try to start background music (will fail without user interaction)
+            try {
+                // Replace with Italian romantic music
+                backgroundMusic.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"; // Replace with actual Italian music URL
+                backgroundMusic.volume = 0.3;
+                document.addEventListener('click', () => {
+                    if (!gameState.musicEnabled) {
+                        backgroundMusic.play().catch(e => console.log("Audio play failed:", e));
+                        gameState.musicEnabled = true;
+                    }
+                }, { once: true });
+            } catch (e) {
+                console.log("Audio not supported:", e);
+            }
+        }
+        
+        // Start the game when page loads
+        window.onload = initGame;
+    </script>
+</body>
+</html>
